@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "dotenv": "^17.1.0",
+    "lowdb": "^7.0.1",
     "telegraf": "^4.16.3"
   }
 }
