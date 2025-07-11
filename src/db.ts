@@ -1,41 +1,14 @@
-import { Chat, User } from '@telegraf/types'
 import { Low } from 'lowdb'
 import { JSONFilePreset } from 'lowdb/node'
-// import { dbDefaultData } from './db-default-data.mjs'
-// import { DBData } from './types/db-data.mjs'
-// import { DBEventReply } from './types/db-event-reply.mjs'
-// import { DBEvent } from './types/db-event.mjs'
-// import { DBUser } from './types/db-user.mjs'
-// import { UserRole } from './enums/user-role.mjs'
-
-type UserId = User['id']
-type ChatId = Chat['id']
-type TopicId = number
-
-type DBUser = {
-	username: string
-	shouldPing: boolean
-}
-
-type DBTopic = {
-	users: Record<UserId, DBUser>
-}
-
-type DBChat = {
-	users: Record<UserId, DBUser>
-	topics?: Record<TopicId, DBTopic>
-}
-
-type DBData = {
-	chats: Record<ChatId, DBChat>
-}
-
-const dbDefaultData: DBData = {
-	chats: {},
-}
+import { dbDefaultData } from './constants/db-default-data.js'
+import { ChatId } from './types/chat-id.js'
+import { DBData } from './types/db-data.js'
+import { DBUser } from './types/db-user.js'
+import { TopicId } from './types/topic-id.js'
+import { UserId } from './types/user-id.js'
 
 export class DB {
-	static db: Low<DBData>
+	private static db: Low<DBData>
 
 	static async init() {
 		console.log('initializing DB...')
@@ -63,7 +36,21 @@ export class DB {
 	}
 
 	static async addChat(chatId: ChatId) {
+		if (this.db.data.chats[chatId]) return
+
 		this.db.data.chats[chatId] = {
+			users: {},
+		}
+
+		await this.db.write()
+	}
+
+	static async addTopic(chatId: ChatId, topicId: TopicId) {
+		const chat = this.db.data.chats[chatId]
+
+		if (!chat?.topics?.[topicId]) return
+
+		chat.topics[topicId] = {
 			users: {},
 		}
 		await this.db.write()
@@ -86,46 +73,16 @@ export class DB {
 
 		if (!chat) return
 
-		const isAddedToChat = !!chat.users[userId]
-		const isAddedToTopic = !!(!topicId || chat.topics?.[topicId].users[userId])
-		if (isAddedToChat && isAddedToTopic) return
-
 		const user: DBUser = {
 			username,
 			shouldPing,
 		}
 
-		chat.users[userId] = user
+		chat.users[userId] ??= user
 
-		if (topicId && chat.topics !== undefined) {
-			chat.topics[topicId].users[userId] = user
-		}
+		const topic = topicId && chat.topics?.[topicId]
+		if (topic) topic.users ??= user
 
 		await this.db.write()
 	}
-
-	// static getUserList({ chatId, topicId }: { userIds: number[] }): DBUser[] {
-	// 	return Object.entries(this.db.data.users)
-	// 		.filter(([k]) => userIds.includes(+k))
-	// 		.map(([, v]) => v)
-	// }
-
-	// static addUser(user: User): undefined {
-	// 	const existingUser = DB.getUser(user.id)
-	// 	if (existingUser) return
-
-	// 	const username = user.username
-
-	// 	if (!username || user.is_bot) return
-
-	// 	const newUser: DBUser = {
-	// 		username: username,
-	// 		shouldPing: true,
-	// 	}
-
-	// 	this.db.data.users[user.id] = newUser
-	// 	this.db.write()
-
-	// 	console.log('User added successfully')
-	// }
 }

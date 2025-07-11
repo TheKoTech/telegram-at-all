@@ -1,43 +1,49 @@
 import 'dotenv/config'
 import { Telegraf } from 'telegraf'
 import { DB } from './db.js'
-import { addUser } from './add-user.js'
+import { updateChat } from './middleware/update-chat.js'
 
 if (!process.env.BOT_TOKEN) {
 	throw new Error('BOT_TOKEN environment variable is not set')
 }
 
+DB.init()
 const bot = new Telegraf(process.env.BOT_TOKEN!)
 
-bot.use(addUser)
+bot.use(updateChat)
 
-bot.hears(/@(all|everyone)/, async ctx => {
+bot.hears(/@(all|everyone|here)/, async ctx => {
 	console.log('text message')
 
 	const chat = ctx.chat
 	const message = ctx.message
-	const chatType = chat.type
+	const topicId = message.message_thread_id
 
-	switch (chatType) {
-		case 'private': {
-			ctx.reply('Бот работает только в групповых чатах.')
-			console.log('private chat')
-			break
-		}
-		case 'group': {
-			ctx.reply('Группа')
-			console.log('group chat')
-			break
-		}
-		case 'supergroup': {
-			ctx.reply('СУПЕР группа')
+	const authorUsername = ctx.from.username
+	if (!authorUsername) return
 
-			const topicId = message.message_thread_id
-
-			console.log('supergroup chat', topicId)
-			break
-		}
+	if (chat.type === 'private') {
+		return ctx.reply('Бот работает только в групповых чатах.')
 	}
+
+	const chatMembers = DB.getUsers({
+		chatId: chat.id,
+		topicId,
+	})
+
+	if (!chatMembers) return
+
+	const replyText = Object.values(chatMembers)
+		.filter(user => user.shouldPing)
+		.filter(user => user.username !== authorUsername)
+		.reduce((acc, prev) => {
+			acc += `@${prev.username}`
+			return acc
+		}, '')
+
+	if (!replyText) return ctx.reply('Некого пинговать 🤷‍♀️')
+
+	return ctx.reply(replyText, { parse_mode: 'Markdown' })
 })
 
 bot.launch()

@@ -1,0 +1,13 @@
+{
+  "chats": {
+    "-1002703369107": {
+      "users": {
+        "409035100": {
+          "username": "Welnyr",
+          "shouldPing": true
+        }
+      }
+    }
+  },
+  "users": {}
+}
