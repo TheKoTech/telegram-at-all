@@ -1,4 +1,4 @@
-import { Context } from 'telegraf'
+import { type Context } from 'telegraf'
 import { DB } from '../db.js'
 
 export const updateChat = async (ctx: Context, next: () => Promise<void>) => {

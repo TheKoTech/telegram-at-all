@@ -1,11 +1,11 @@
 import { Low } from 'lowdb'
 import { JSONFilePreset } from 'lowdb/node'
 import { dbDefaultData } from './constants/db-default-data.js'
-import { ChatId } from './types/chat-id.js'
-import { DBData } from './types/db-data.js'
-import { DBUser } from './types/db-user.js'
-import { TopicId } from './types/topic-id.js'
-import { UserId } from './types/user-id.js'
+import { type ChatId } from './types/chat-id.js'
+import { type DBData } from './types/db-data.js'
+import { type DBUser } from './types/db-user.js'
+import { type TopicId } from './types/topic-id.js'
+import { type UserId } from './types/user-id.js'
 
 export class DB {
 	private static db: Low<DBData>
@@ -29,7 +29,7 @@ export class DB {
 		if (!chat) return
 
 		if (topicId && chat.topics !== undefined) {
-			return chat.topics[topicId].users
+			return chat.topics[topicId]?.users
 		}
 
 		return chat.users
