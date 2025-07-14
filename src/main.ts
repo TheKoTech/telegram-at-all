@@ -7,6 +7,8 @@ if (!process.env.BOT_TOKEN) {
 	throw new Error('BOT_TOKEN environment variable is not set')
 }
 
+const sanitizeUsername = (username: string) => username.replaceAll(/_/g, '\\_')
+
 DB.init()
 const bot = new Telegraf(process.env.BOT_TOKEN!)
 
@@ -37,7 +39,7 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 		.filter(user => user.shouldPing)
 		.filter(user => user.username !== authorUsername)
 		.reduce((acc, prev) => {
-			acc += `@${prev.username}`
+			acc += `@${sanitizeUsername(prev.username)} `
 			return acc
 		}, '')
 
