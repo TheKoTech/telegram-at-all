@@ -19,7 +19,7 @@
 	"main": "src/main.ts",
 	"scripts": {
 		"dev": "tsc --watch",
-		"build": "esbuild src/main.ts --bundle --platform=node --outdir=dist --format=esm --external:dotenv --external:telegraf --external:",
+		"build": "esbuild src/main.ts --bundle --platform=node --outdir=dist --format=esm --external:dotenv --external:telegraf --external:lowdb",
 		"preview": "node ./dist/main.js"
 	},
 	"dependencies": {
