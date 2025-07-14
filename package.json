@@ -1,39 +1,39 @@
 {
-  "name": "telegram-at-all",
-  "version": "0.0.0",
-  "description": "Telegram bot that lets you @all and @everyone",
-  "keywords": [
-    "telegram",
-    "bot"
-  ],
-  "homepage": "https://github.com/TheKoTech/telegram-at-all#readme",
-  "bugs": {
-    "url": "https://github.com/TheKoTech/telegram-at-all/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TheKoTech/telegram-at-all.git"
-  },
-  "author": "welnyr",
-  "type": "module",
-  "main": "src/main.ts",
-  "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
-    "preview": "node ./dist/main.js"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.30.1",
-    "@types/node": "^24.0.12",
-    "eslint": "^9.30.1",
-    "globals": "^16.3.0",
-    "prettier": "^3.6.2",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0"
-  },
-  "dependencies": {
-    "dotenv": "^17.1.0",
-    "lowdb": "^7.0.1",
-    "telegraf": "^4.16.3"
-  }
+	"name": "telegram-at-all",
+	"version": "0.0.0",
+	"description": "Telegram bot that lets you @all and @everyone",
+	"keywords": [
+		"telegram",
+		"bot"
+	],
+	"homepage": "https://github.com/TheKoTech/telegram-at-all#readme",
+	"bugs": {
+		"url": "https://github.com/TheKoTech/telegram-at-all/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TheKoTech/telegram-at-all.git"
+	},
+	"author": "welnyr",
+	"type": "module",
+	"main": "src/main.ts",
+	"scripts": {
+		"dev": "tsc --watch",
+		"build": "tsc",
+		"preview": "node ./dist/main.js"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.31.0",
+		"@types/node": "^24.0.13",
+		"eslint": "^9.31.0",
+		"globals": "^16.3.0",
+		"prettier": "^3.6.2",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.36.0"
+	},
+	"dependencies": {
+		"dotenv": "^17.2.0",
+		"lowdb": "^7.0.1",
+		"telegraf": "^4.16.3"
+	}
 }
