@@ -15,8 +15,6 @@ const bot = new Telegraf(process.env.BOT_TOKEN!)
 bot.use(updateChat)
 
 bot.hears(/@(all|everyone|here)/, async ctx => {
-	console.log('text message')
-
 	const chat = ctx.chat
 	const message = ctx.message
 	const topicId = message.message_thread_id
@@ -48,7 +46,17 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 	return ctx.reply(replyText, { parse_mode: 'Markdown' })
 })
 
-bot.launch()
+bot
+	.catch((error, ctx) => {
+		// @ts-expect-error weh
+		if (error?.response?.description === 'Bad Request: TOPIC_CLOSED') {
+			console.log('Some one tried to @all in a closed topic.')
+			return
+		}
+
+		return console.error(error, ctx)
+	})
+	.launch()
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'))
