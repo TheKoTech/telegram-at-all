@@ -1,6 +1,6 @@
 {
 	"name": "telegram-at-all",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "Telegram bot that lets you @all and @everyone",
 	"keywords": [
 		"telegram",
@@ -18,8 +18,8 @@
 	"type": "module",
 	"main": "src/main.ts",
 	"scripts": {
-		"dev": "tsc --watch",
 		"build": "esbuild src/main.ts --bundle --platform=node --outdir=dist --format=esm --external:dotenv --external:telegraf --external:lowdb",
+		"dev": "npm run build -- --watch",
 		"preview": "node ./dist/main.js"
 	},
 	"dependencies": {

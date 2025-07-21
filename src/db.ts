@@ -48,11 +48,13 @@ export class DB {
 	static async addTopic(chatId: ChatId, topicId: TopicId) {
 		const chat = this.db.data.chats[chatId]
 
-		if (!chat?.topics?.[topicId]) return
+		if (!chat || chat?.topics?.[topicId]) return
 
+		chat.topics ??= {}
 		chat.topics[topicId] = {
 			users: {},
 		}
+
 		await this.db.write()
 	}
 
@@ -69,7 +71,8 @@ export class DB {
 		username: DBUser['username']
 		shouldPing?: boolean
 	}) {
-		const chat = this.db.data.chats[chatId]
+		const data = this.db.data
+		const chat = data.chats[chatId]
 
 		if (!chat) return
 
@@ -81,7 +84,7 @@ export class DB {
 		chat.users[userId] ??= user
 
 		const topic = topicId && chat.topics?.[topicId]
-		if (topic) topic.users ??= user
+		if (topic) topic.users[userId] ??= user
 
 		await this.db.write()
 	}

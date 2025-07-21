@@ -11,9 +11,9 @@ export const updateChat = async (ctx: Context, next: () => Promise<void>) => {
 	DB.addChat(chat.id)
 
 	const topicId = ctx.message?.message_thread_id
-	if (topicId) DB.addTopic(chat.id, topicId)
+	if (topicId) await DB.addTopic(chat.id, topicId)
 
-	DB.addUser({
+	await DB.addUser({
 		chatId: chat.id,
 		topicId,
 		username: user.username,

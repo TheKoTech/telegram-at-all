@@ -2,6 +2,8 @@ import 'dotenv/config'
 import { Telegraf } from 'telegraf'
 import { DB } from './db.js'
 import { updateChat } from './middleware/update-chat.js'
+import { adminsOnly } from './middleware/admins-only.js'
+import { execSync } from 'child_process'
 
 if (!process.env.BOT_TOKEN) {
 	throw new Error('BOT_TOKEN environment variable is not set')
@@ -26,9 +28,10 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 		return ctx.reply('Бот работает только в групповых чатах.')
 	}
 
+	const atHere = ctx.match[0] === '@here'
 	const chatMembers = DB.getUsers({
 		chatId: chat.id,
-		topicId,
+		topicId: atHere ? topicId : undefined,
 	})
 
 	if (!chatMembers) return
@@ -44,6 +47,32 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 	if (!replyText) return ctx.reply('Некого пинговать 🤷‍♀️')
 
 	return ctx.reply(replyText, { parse_mode: 'Markdown' })
+})
+
+const checkForUpdates = () => {
+	try {
+		execSync('git fetch --tags', { stdio: 'pipe' })
+		const currentTag = execSync(
+			'git describe --tags --exact-match HEAD 2>/dev/null || echo "no-tag"',
+			{ encoding: 'utf8' },
+		).trim()
+		const latestTag = execSync('git describe --tags --abbrev=0 origin/main', {
+			encoding: 'utf8',
+		}).trim()
+
+		return { hasUpdates: currentTag !== latestTag, currentTag, latestTag }
+	} catch {
+		return { hasUpdates: false, currentTag: 'unknown', latestTag: 'unknown' }
+	}
+}
+
+bot.command('update', adminsOnly, async ctx => {
+	const { currentTag, hasUpdates, latestTag } = checkForUpdates()
+
+	if (!hasUpdates) return ctx.reply('Already on the newest version')
+
+	await ctx.reply(`Updating from ${currentTag} to ${latestTag}...`)
+	process.exit(10)
 })
 
 bot
