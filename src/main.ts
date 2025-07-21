@@ -66,6 +66,14 @@ const checkForUpdates = () => {
 	}
 }
 
+bot.command('start', async ctx => {
+	ctx.reply(
+		'Пингует всех в группе. Реагирует на: @all, @everyone и @here\n\n' +
+			'@all и @everyone пингуют всех, кто оставлял сообщения для бота\n' +
+			'@here пингует всех, кто оставлял сообщения в конкретном топике',
+	)
+})
+
 bot.command('update', adminsOnly, async ctx => {
 	const { currentTag, hasUpdates, latestTag } = checkForUpdates()
 

@@ -1,6 +1,6 @@
 {
 	"name": "telegram-at-all",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Telegram bot that lets you @all and @everyone",
 	"keywords": [
 		"telegram",
