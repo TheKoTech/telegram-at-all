@@ -74,9 +74,9 @@ const stopBot = () => {
 }
 
 bot.command('start', async ctx => {
-	ctx.reply(
+	return ctx.reply(
 		'Пингует всех в группе. Реагирует на: @all, @everyone и @here\n\n' +
-			'@all и @everyone пингуют всех, кто оставлял сообщения для бота\n' +
+			'@all и @everyone пингуют всех, кто оставлял сообщения в чате\n' +
 			'@here пингует всех, кто оставлял сообщения в конкретном топике',
 	)
 })
