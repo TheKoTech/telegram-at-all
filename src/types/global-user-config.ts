@@ -1,3 +1,4 @@
 export type GlobalUserConfig = {
-	shouldPing: boolean
+	username: string
+	shouldIgnore?: boolean
 }

@@ -18,7 +18,6 @@ export const updateChat = async (ctx: Context, next: () => Promise<void>) => {
 		topicId,
 		username: user.username,
 		userId: user.id,
-		shouldPing: true,
 	})
 
 	return next()

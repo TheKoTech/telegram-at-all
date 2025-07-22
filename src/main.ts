@@ -21,8 +21,7 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 	const message = ctx.message
 	const topicId = message.message_thread_id
 
-	const authorUsername = ctx.from.username
-	if (!authorUsername) return
+	const fromId = ctx.from.id
 
 	if (chat.type === 'private') {
 		return ctx.reply('Бот работает только в групповых чатах.')
@@ -36,11 +35,23 @@ bot.hears(/@(all|everyone|here)/, async ctx => {
 
 	if (!chatMembers) return
 
-	const replyText = Object.values(chatMembers)
-		.filter(user => user.shouldPing)
-		.filter(user => user.username !== authorUsername)
-		.reduce((acc, prev) => {
-			acc += `@${sanitizeUsername(prev.username)} `
+	const replyText = Object.keys(chatMembers)
+		.filter(
+			userId =>
+				+userId !== fromId &&
+				!DB.shouldIgnore({
+					userId: +userId,
+					chatId: chat.id,
+					topicId,
+				}),
+		)
+
+		.reduce((acc, userId) => {
+			const rawUserName = DB.getUserName(+userId)
+			if (!rawUserName) return acc
+
+			acc += `@${sanitizeUsername(rawUserName)} `
+
 			return acc
 		}, '')
 

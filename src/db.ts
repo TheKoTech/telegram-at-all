@@ -6,9 +6,19 @@ import { type DBData } from './types/db-data.js'
 import { type DBUser } from './types/db-user.js'
 import { type TopicId } from './types/topic-id.js'
 import { type UserId } from './types/user-id.js'
+import type { User } from 'telegraf/types'
+
+type ChatInfo = {
+	chatId: ChatId
+	topicId?: TopicId
+}
 
 export class DB {
 	private static db: Low<DBData>
+
+	private static get data(): DBData {
+		return this.db.data
+	}
 
 	static async init() {
 		console.log('initializing DB...')
@@ -20,11 +30,8 @@ export class DB {
 	static getUsers({
 		chatId,
 		topicId,
-	}: {
-		chatId: ChatId
-		topicId?: TopicId
-	}): Record<UserId, DBUser> | undefined {
-		const chat = this.db.data.chats[chatId]
+	}: ChatInfo): Record<UserId, DBUser> | undefined {
+		const chat = DB.data.chats[chatId]
 
 		if (!chat) return
 
@@ -35,25 +42,46 @@ export class DB {
 		return chat.users
 	}
 
-	static async addChat(chatId: ChatId) {
-		if (this.db.data.chats[chatId]) return
+	static getUserName(userId: UserId) {
+		return DB.data.users[userId]?.username
+	}
 
-		this.db.data.chats[chatId] = {
-			users: {},
-		}
+	static shouldIgnore({
+		userId,
+		chatId,
+		topicId,
+	}: ChatInfo & { userId: UserId }): boolean | undefined {
+		const chat = DB.data.chats[chatId]
+
+		if (!chat) return
+
+		const topicPreference =
+			topicId !== undefined &&
+			chat?.topics?.[topicId]?.users[userId]?.shouldIgnore
+		if (topicPreference !== undefined) return topicPreference
+
+		const chatPreference = chat.users[userId]?.shouldIgnore
+		if (chatPreference !== undefined) return chatPreference
+
+		const globalPreference = DB.data.users[userId]?.shouldIgnore
+		return globalPreference !== undefined ? globalPreference : false
+	}
+
+	static async addChat(chatId: ChatId) {
+		if (DB.data.chats[chatId]) return
+
+		DB.data.chats[chatId] = { users: {} }
 
 		await this.db.write()
 	}
 
 	static async addTopic(chatId: ChatId, topicId: TopicId) {
-		const chat = this.db.data.chats[chatId]
+		const chat = DB.data.chats[chatId]
 
 		if (!chat || chat?.topics?.[topicId]) return
 
 		chat.topics ??= {}
-		chat.topics[topicId] = {
-			users: {},
-		}
+		chat.topics[topicId] = { users: {} }
 
 		await this.db.write()
 	}
@@ -63,24 +91,22 @@ export class DB {
 		topicId,
 		userId,
 		username,
-		shouldPing = true,
 	}: {
 		chatId: ChatId
 		topicId?: TopicId
 		userId: UserId
-		username: DBUser['username']
-		shouldPing?: boolean
+		username: User['username']
 	}) {
-		const data = this.db.data
+		const data = DB.data
 		const chat = data.chats[chatId]
 
-		if (!chat) return
+		if (!chat || !username) return
 
-		const user: DBUser = {
+		const user: DBUser = {}
+
+		DB.data.users[userId] ??= {
 			username,
-			shouldPing,
 		}
-
 		chat.users[userId] ??= user
 
 		const topic = topicId && chat.topics?.[topicId]

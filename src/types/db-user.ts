@@ -1,4 +1,3 @@
 export type DBUser = {
-	username: string
-	shouldPing: boolean
+	shouldIgnore?: boolean
 }
