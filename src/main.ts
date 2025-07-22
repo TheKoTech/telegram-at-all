@@ -56,7 +56,7 @@ const checkForUpdates = () => {
 			'git describe --tags --exact-match HEAD 2>/dev/null || echo "no-tag"',
 			{ encoding: 'utf8' },
 		).trim()
-		const latestTag = execSync('git describe --tags --abbrev=0 origin/main', {
+		const latestTag = execSync('git describe --tags --abbrev=0 origin/master', {
 			encoding: 'utf8',
 		}).trim()
 
@@ -64,6 +64,13 @@ const checkForUpdates = () => {
 	} catch {
 		return { hasUpdates: false, currentTag: 'unknown', latestTag: 'unknown' }
 	}
+}
+
+const stopBot = () => {
+	setTimeout(() => {
+		bot.stop('SIGING')
+		process.exit(10)
+	}, 5000)
 }
 
 bot.command('start', async ctx => {
@@ -80,7 +87,8 @@ bot.command('update', adminsOnly, async ctx => {
 	if (!hasUpdates) return ctx.reply('Already on the newest version')
 
 	await ctx.reply(`Updating from ${currentTag} to ${latestTag}...`)
-	process.exit(10)
+
+	stopBot()
 })
 
 bot
