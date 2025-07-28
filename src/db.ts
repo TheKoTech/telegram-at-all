@@ -1,17 +1,13 @@
 import { Low } from 'lowdb'
 import { JSONFilePreset } from 'lowdb/node'
-import { dbDefaultData } from './constants/db-default-data.js'
-import { type ChatId } from './types/chat-id.js'
-import { type DBData } from './types/db-data.js'
-import { type DBUser } from './types/db-user.js'
-import { type TopicId } from './types/topic-id.js'
-import { type UserId } from './types/user-id.js'
 import type { User } from 'telegraf/types'
-
-type ChatInfo = {
-	chatId: ChatId
-	topicId?: TopicId
-}
+import { dbDefaultData } from './constants/db-default-data.js'
+import type { ChatId } from './types/chat-id.js'
+import type { ChatInfo } from './types/chat-info.js'
+import type { DBData } from './types/db-data.js'
+import type { DBUser } from './types/db-user.js'
+import type { TopicId } from './types/topic-id.js'
+import type { UserId } from './types/user-id.js'
 
 export class DB {
 	private static db: Low<DBData>
