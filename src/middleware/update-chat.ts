@@ -11,7 +11,15 @@ export const updateChat = async (ctx: Context, next: () => Promise<void>) => {
 	DB.addChat(chat.id)
 
 	const topicId = ctx.message?.message_thread_id
-	if (topicId) await DB.addTopic(chat.id, topicId)
+	if (topicId) {
+		console.log('Adding new topic')
+		console.log({
+			topicId,
+			chatId: chat.id,
+			text: 'text' in ctx.message ? ctx.message.text : undefined,
+		})
+		await DB.addTopic(chat.id, topicId)
+	}
 
 	await DB.addUser({
 		chatId: chat.id,
